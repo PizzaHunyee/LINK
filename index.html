@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Encryption</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+</head>
+<body>
+    <h1>Text Encryption</h1>
+    <label for="textInput">Enter your text:</label>
+    <textarea id="textInput" rows="4" cols="50"></textarea>
+    <br>
+    <label for="passwordInput">Enter password:</label>
+    <input type="password" id="passwordInput">
+    <br>
+    <button onclick="encryptText()">Encrypt Text</button>
+
+    <h2>Decryption</h2>
+    <label for="encryptedLink">Enter encrypted link:</label>
+    <input type="text" id="encryptedLink">
+    <br>
+    <label for="decryptionPassword">Enter password:</label>
+    <input type="password" id="decryptionPassword">
+    <br>
+    <button onclick="decryptText()">Decrypt Text</button>
+
+    <div id="resultContainer"></div>
+
+    <script>
+        function encryptText() {
+            var textInput = document.getElementById("textInput").value;
+            var passwordInput = document.getElementById("passwordInput").value;
+
+            var encryptedText = CryptoJS.AES.encrypt(textInput, passwordInput).toString();
+            var link = window.location.href + '?data=' + encodeURIComponent(encryptedText);
+            document.getElementById("resultContainer").innerHTML = `<p>Encrypted Link: <a href="${link}" target="_blank">${link}</a></p>`;
+        }
+
+        function decryptText() {
+            var encryptedLink = document.getElementById("encryptedLink").value;
+            var decryptionPassword = document.getElementById("decryptionPassword").value;
+
+            var encryptedText = getParameterByName('data', encryptedLink);
+
+            try {
+                var decryptedText = CryptoJS.AES.decrypt(encryptedText, decryptionPassword).toString(CryptoJS.enc.Utf8);
+                document.getElementById("resultContainer").innerHTML = `<p>Decrypted Text: ${decryptedText}</p>`;
+            } catch (error) {
+                document.getElementById("resultContainer").innerHTML = "<p>Incorrect password or invalid link</p>";
+            }
+        }
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+    </script>
+</body>
+</html>
